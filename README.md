@@ -2,7 +2,7 @@
 ## What is Ansible?
 Ansible is an automation tool that allows you to change settings on multiple machines while only using 1 controller machine. In our example, we will only be using 3 machines, but in realisty, Ansible can be used to change settings on 10's or even hundreds of machines.
 
-![](./img/Ansible_Diagram.PNG)
+![](https://github.com/Mo0rBy/SRE_intro_to_IAC_and_Ansible/blob/main/img/Ansible_Diagram.png)
 
 ### Setting up the machines
 
@@ -50,7 +50,7 @@ Edit the `hosts` file and add the IP of your machines.
 
 Execute the `ansible all -m ping` again. Now we get this output:
 
-![](./img/Ansible_ping_denied.PNG)
+![](https://github.com/Mo0rBy/SRE_intro_to_IAC_and_Ansible/blob/main/img/Ansible_ping_denied.PNG)
 
 Edit the `/etc/ansible/hosts` file again and add the following variables after the machines IP address:
 ```
@@ -61,7 +61,7 @@ This tells Ansible to connect using SSH, and gives the connection a username and
 
 Now if we execute the `ansible all -m ping`, we get the output:
 
-![](./img/Ansible_ping_accepted.PNG)
+![](https://github.com/Mo0rBy/SRE_intro_to_IAC_and_Ansible/blob/main/img/Ansible_ping_accepted.PNG)
 
 __*You may see a depreciation warning, but this isn't anything to worry about.*__
 
@@ -72,7 +72,7 @@ We can ping the same machine using `ansible web -m ping` because we gave the web
 ### Ad hoc commands
 We can execute Adhoc commands using Ansible to obtain information about the agent machines. For example, we can find the name of our `web` machine like this > `ansible web -a "uname -a"` and we will see this output:
 
-![](./img/adhoc_uname.PNG)
+![](https://github.com/Mo0rBy/SRE_intro_to_IAC_and_Ansible/blob/main/img/adhoc_uname.PNG)
 
 This is carrying out an "ad hoc" command on a single machine, but we can run the command on **all** our machines using only 1 command > `ansible all -a "uname -a"`
 
