@@ -67,6 +67,13 @@ __*You may see a depreciation warning, but this isn't anything to worry about.*_
 
 We can ping the same machine using `ansible web -m ping` because we gave the web machine the `[web]` heading in the `hosts` file.
 
-**Repeat the exact same process with the `db` machine**
+**Repeat the exact same process with the `db` machine _(and make sure to put it under the `[db]` header)_**
 
 ### Adhoc commands
+We can execute Adhoc commands using Ansible to obtain information about the agent machines. For example, we can find the name of our `web` machine like this > `ansible web -a "uname -a"` and we will see this output:
+
+![](./img/adhoc_uname.PNG)
+
+This is carrying ouyt an adhoc command on a single machine, but we can run the command on **all** our machines using only 1 command > `ansible all -a "uname -a"`
+
+The basic idea is, we can use Ansible to execute any command we would normally use within the Linux terminal and Ansible will then show us the output of those commands from each machine.
