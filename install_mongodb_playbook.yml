@@ -1,0 +1,37 @@
+---
+- hosts: db
+
+  gather_facts: yes
+
+  become: true
+
+  tasks:
+  - name: "Update and upgrade"
+    shell: |
+      sudo apt-get update -y
+      sudo apt-get upgrade -y
+      
+# Create directory for cloned repo
+  - name: Creates directory
+    file:
+      path: /home/vagrant/app_repo
+      state: directory
+
+  - name: "Cloning the GitHub repo to get the app folder"
+    ansible.builtin.git:
+      clone: yes
+      dest: /home/vagrant/app_repo
+      recursive: yes
+      repo: https://github.com/Mo0rBy/SRE_cloud_computing_intro_AWS.git
+
+# Install Mongodb (like in the original provision.sh)
+  - name: "Execute mongodb provisioning commands"
+    shell: |
+      wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+      echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+      sudo apt-get update
+      sudo apt-get install -y mongodb-org
+      sudo rm /etc/mongod.conf
+      sudo ln -s /home/vagrant/app_repo/db/mongodb_config/mongod.conf /etc/mongod.conf
+      sudo systemctl start mongod
+      sudo systemctl enable mongod

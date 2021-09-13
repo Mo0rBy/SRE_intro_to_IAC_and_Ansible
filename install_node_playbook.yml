@@ -1,0 +1,91 @@
+---
+- hosts: web
+
+  gather_facts: yes
+
+  become: true
+
+  tasks: 
+  - name: "Update and upgrade"
+    shell: |
+      sudo apt-get update -y
+      sudo apt-get upgrade -y
+
+  - name: "Install python software properties"
+    apt: pkg=software-properties-common state=present
+
+# Install nginx
+  - name: "Install Nginx"
+    apt: pkg=nginx state=present
+
+
+# Install nodejs
+  - name: "Add nodejs apt key"
+    apt_key:
+      url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+      state: present
+
+  - name: "Add nodejs 13.x ppa for apt repo"
+    apt_repository:
+      repo: deb https://deb.nodesource.com/node_13.x bionic main
+      update_cache: yes
+
+  - name: "Install nodejs"
+    apt:
+      update_cache: yes
+      name: nodejs
+      state: present
+
+# Install npm package manager
+  - name: "Install npm package manager"
+    shell: "sudo apt-get install npm -y"
+      
+# Create directory for cloned repo
+  - name: Creates directory
+    file:
+      path: /home/vagrant/app_repo
+      state: directory
+
+  - name: "Cloning the GitHub repo to get the app folder"
+    ansible.builtin.git:
+      clone: yes
+      dest: /home/vagrant/app_repo
+      recursive: yes
+      repo: https://github.com/Mo0rBy/SRE_cloud_computing_intro_AWS.git
+
+# Setup the nginx reverse proxy by copying the config file in the clones repo
+  - name: "Remove the default nginx config and replace with reverse proxy config file"
+    shell: |
+      sudo rm /etc/nginx/sites-available/default
+      sudo ln -s /home/vagrant/app_repo/app_provision/default/default.txt /etc/nginx/sites-available/default
+
+# Install pm2
+  - name: "Install pm2"
+    shell: "npm install pm2 -g -y"
+
+# Remove existing DB_HOST env variable (if it exists)
+  - name: "Remove DB_HOST variable"
+    shell: |
+      sed '2d' /etc/environment
+
+# Add DB_HOST variable to system and environment file
+  - name: "Add DB_HOST variable"
+    shell: |
+      sed '1 a DB_HOST=mongodb://192.168.33.11:27017/posts' /etc/environment
+      export DB_HOST=mongodb://192.168.33.11:27017/posts
+
+# npm install
+  - name: "Go to app folder and npm install"
+    command: chdir=/home/vagrant/app_repo/app npm install
+
+# Seed the database
+  - name: "Seed the database"
+    command: chdir=/home/vagrant/app_repo/app node seeds/seed.js
+
+# Kill pm2
+  - name: "Kill pm2 processes"
+    command: "pm2 kill"
+
+# Start the app
+  - name: "Start app"
+    command: chdir=/home/vagrant/app_repo/app pm2 start app.js

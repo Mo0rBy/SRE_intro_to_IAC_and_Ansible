@@ -1,4 +1,28 @@
 # Using Ansible - Infrastructure as Code
+## Infrastructure as Code (IaC)
+In the IT world, we want to have everything set up in an IaC format. This means we can automate lots of different things and it makes our lives much easier.
+
+There are 2 forms of IaC, and some tools that can be used for each are listed:
+1. Configuration management
+    - Ansible
+    - SolarWinds
+    - Auvik
+    - CFEngine
+    - Puppet
+    - CHEF
+    - SALTSTACK
+    - JUJU
+2. Orchestration
+    - Ansible
+    - Nomad
+    - Rancher
+    - Kubernetes
+    - Marathon
+    - Mesosphere
+    - Terraform
+
+All of these tools work in either a *push* or *pull* configuration. Both these methods work in the same way that push adn pull works for Git.
+
 ## What is Ansible?
 Ansible is an automation tool that allows you to change settings on multiple machines while only using 1 controller machine. In our example, we will only be using 3 machines, but in realisty, Ansible can be used to change settings on 10's or even hundreds of machines.
 
@@ -30,10 +54,14 @@ sudo apt-get install ansible -y
 We can confirm that Ansible is installed by using `ansible --version`. This command will give information on the installed Ansible version and the location of the default configuration directories.
 This machine is now the Ansible controller machine.
 
+This can also be done by navigating to the default directory where Ansible's config files are stored > `cd /etc/ansible`
+
 ### Manual SSH with Ansible
 To SSH into the agent machines, simply run `ssh vagrant@[machine-ip]`, where `[machine-ip]` is substituted for the machines IP address.
 
 Can test the the connection works by running any command. To exit back to the controller machine's terminal, use `Exit`.
+
+**MANUAL LOGIN MUST BE COMPLETED FIRST!! BEFORE ANSIBLE CAN AUTOMATICALLY LOGIN INTO THE MACHINE [FOR PLAYBOOKS]**
 
 ### Ansible configuration file, pinging and SSH login
 We can ping the machines using the Ansible command > `ansible all -m ping`
@@ -45,6 +73,9 @@ implicit localhost does not match 'all'
 ```
 
 #### Define the agent machines and ping
+
+**MUST MANUALLY LOGIN FIRST!! REFER TO _Manual SSH with Ansible_**
+
 We haven't defined what machines we want to control. So, we must now go into the Ansible config file and tell Ansible what machines to communicate with.
 
 Go to the Ansible config directory > `cd /etc/ansible/`
@@ -56,8 +87,11 @@ Execute the `ansible all -m ping` again. Now we get this output:
 
 Edit the `/etc/ansible/hosts` file again and add the following variables after the machines IP address:
 ```
+[web]
 192.168.33.10 ansible_connection=ssh ansible_user=vagrant ansible_ssh_pass=vagrant
 ```
+
+*(Within the `hosts` file, we can define tags such as `[web]` or `[db]` which can include multiple machine IP addresses)*
 
 This tells Ansible to connect using SSH, and gives the connection a username and password.
 
@@ -80,21 +114,15 @@ This is carrying out an "ad hoc" command on a single machine, but we can run the
 
 The basic idea is, we can use Ansible to execute any command we would normally use within the Linux terminal and Ansible will then show us the output of those commands from each machine.
 
----
-## To-Do Check-List
-- IaC - Configuration Management and Orchestration
-- Which tools are used for "Push" config and "Pull" config
+The tructure of an ad-hoc command is as follows *(all on one line)*:
 
-- What is Ansible and benefit of it
-- Why we should use Ansible
-- Create a diagram for Ansible on-prom, hybrid and public architecture
-- Installation and setting up Ansible controller with 2 agent nodes > Include commnads in your README.md
-- What is the default deirectory structure for Ansible
-- What is the Inventory/hosts file and the purpose of it
-- What should be added to the hosts file to establish a secure connection between Ansible controller and agent nodes?(include code block)
-- What are Ansible ad-hoc commands
-- add a structure of creating adhoc commands > e.g. `ansible all -m ping` (-m means module) [break down and explain the syntax]
-- include all the ad-hoc commands we have used today in this documentation
+- `ansible` *(to use ansible)*
+- `all` or `[tag]` **e.g. `web`** *(Defines what machines to execute the command on)*
+- `-m <ModuleName>` *(Defines a module to use, other option flags are available)*
+- `"CLI-command-here -a -b etc"` *(The command you want to run on the defined machines goes inside the quotes. It is written in the exact same way you'd write it if you were manually executing the command in the machine)*
+
+
+`ansible web -m shell -a "cd ~" --become` *Changing directory with ad-hoc command*
 
 ---
 ## Ansible Playbooks
@@ -102,10 +130,29 @@ Ansible playbooks are a completely different way to use Ansible when compared to
 
 Ansible playbooks are `.yml` files *(can also be written as `.yaml`)*. `YAML` stands for **Y**et **A**nother **M**arkup **L**anguage.
 
-### Installing nginx using an Ansible Playbook
+### Installing nginx using a playbook
 Playbooks always start with 3 dashes > `---`
 
-**INSERT YAML FILE HERE**
+```YAML
+# Create a playbook to install nginx web server on the web machine
+# web > 192.168.33.10
+
+# 3 dashes to tell the interpreter to start the YAML file
+---
+# Add the name of the host
+- hosts: web
+# Gather facts about the installation steps (optional)
+# This prints to the terminal what is occuring behind the scenes
+# (saying no will make the process quicker)
+  gather_facts: yes
+# We need admin access
+  become: true
+# Add instructions to install nginx
+  tasks: 
+  - name: Install Nginx
+    apt: pkg=nginx state=present
+# Ensure the nginx server is running
+```
 
 - The `- hosts: web` tells Ansible to perform the following tasks on all the machines that come under the `[web]` heading.
 - The `gather_facts: yes` tells Ansible to print what it is doing to the terminal. *It basically just prints the task that it is currently completeing*
@@ -122,4 +169,3 @@ We should see this output:
 
 ![](./img/ansible_nginx_status_check.PNG)
 
-### 
