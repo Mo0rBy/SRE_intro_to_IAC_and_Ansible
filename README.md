@@ -18,6 +18,8 @@ After initialising these machines, we want to set them up using:
 ### Installing Ansible
 We only need to install Ansible on 1 machine and not on the machines that are controlled by Ansible. This is known as "agentless".
 
+*Defintion of Agentless (from Whatis.com) = Agentless, in computing, refers to operations where no service, daemon or process (AKA an agent) needs to run in the background on the machine the action is being performed on.*
+
 To install Ansible, execute the following commands:
 ```
 sudo apt-get install software-properties-common -y
@@ -77,3 +79,47 @@ We can execute Adhoc commands using Ansible to obtain information about the agen
 This is carrying out an "ad hoc" command on a single machine, but we can run the command on **all** our machines using only 1 command > `ansible all -a "uname -a"`
 
 The basic idea is, we can use Ansible to execute any command we would normally use within the Linux terminal and Ansible will then show us the output of those commands from each machine.
+
+---
+## To-Do Check-List
+- IaC - Configuration Management and Orchestration
+- Which tools are used for "Push" config and "Pull" config
+
+- What is Ansible and benefit of it
+- Why we should use Ansible
+- Create a diagram for Ansible on-prom, hybrid and public architecture
+- Installation and setting up Ansible controller with 2 agent nodes > Include commnads in your README.md
+- What is the default deirectory structure for Ansible
+- What is the Inventory/hosts file and the purpose of it
+- What should be added to the hosts file to establish a secure connection between Ansible controller and agent nodes?(include code block)
+- What are Ansible ad-hoc commands
+- add a structure of creating adhoc commands > e.g. `ansible all -m ping` (-m means module) [break down and explain the syntax]
+- include all the ad-hoc commands we have used today in this documentation
+
+---
+## Ansible Playbooks
+Ansible playbooks are a completely different way to use Ansible when compared to ad-hoc commands. The new goal is install the applications we need for the `web` and `db` machines. Instead of doing this manually for both machines, we can create playbooks.
+
+Ansible playbooks are `.yml` files *(can also be written as `.yaml`)*. `YAML` stands for **Y**et **A**nother **M**arkup **L**anguage.
+
+### Installing nginx using an Ansible Playbook
+Playbooks always start with 3 dashes > `---`
+
+**INSERT YAML FILE HERE**
+
+- The `- hosts: web` tells Ansible to perform the following tasks on all the machines that come under the `[web]` heading.
+- The `gather_facts: yes` tells Ansible to print what it is doing to the terminal. *It basically just prints the task that it is currently completeing*
+- The `become: true` line gives the YAML file admin access. *This is the same logging in as the root user, it is required to install applications*
+- The next part is `tasks:`. This tells the YAML file that the following lines will be tasks.
+- `- name: Install Nginx` creates a new task with the name *Install Nginx* and the following lines within the code block are part of that task
+- `apt: pkg=nginx state=present` tells YAML to install the nginx package using the `apt` package manager. `state=present` tells YAML to ensure that the application is running.
+
+The YAML file needs to be present within the `/etc/ansible` directory. To execute the playbook, the command is > `ansible-playbook nginx_playbook.yml`
+
+After the playbook has finsihed running and installing nginx, we can check that it is running using and ad-hoc command > `ansible web -a "systemctl status nginx"`
+
+We should see this output:
+
+![](./img/ansible_nginx_status_check.PNG)
+
+### 
