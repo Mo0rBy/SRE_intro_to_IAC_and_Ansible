@@ -37,8 +37,8 @@
       state: present
 
 # Install npm package manager
-  - name: "Install npm package manager"
-    shell: "sudo apt-get install npm -y"
+#  - name: "Install npm package manager"
+#    shell: "sudo apt-get install npm -y"
       
 # Create directory for cloned repo
   - name: Creates directory
