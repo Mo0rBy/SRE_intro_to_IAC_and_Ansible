@@ -4,6 +4,7 @@
 # 3 dashes to tell the interpreter to start the YAML file
 ---
 # Add the name of the host
+# Change to - hosts: aws to act on EC2 instances
 - hosts: web
 # Gather facts about the installation steps (optional)
 # This prints to the terminal what is occuring behind the scenes
