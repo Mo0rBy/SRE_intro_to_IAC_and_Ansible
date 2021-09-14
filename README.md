@@ -77,7 +77,7 @@ implicit localhost does not match 'all'
 
 #### Define the agent machines and ping
 
-**MUST MANUALLY LOGIN FIRST!! REFER TO _Manual SSH with Ansible_**
+**MUST MANUALLY LOGIN FIRST!! REFER TO _[Manual SSH with Ansible](#manual-shh-with-ansible)_**
 
 We haven't defined what machines we want to control. So, we must now go into the Ansible config file and tell Ansible what machines to communicate with.
 
