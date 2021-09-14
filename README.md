@@ -57,11 +57,14 @@ This machine is now the Ansible controller machine.
 This can also be done by navigating to the default directory where Ansible's config files are stored > `cd /etc/ansible`
 
 ### Manual SSH with Ansible
+
+![](./img/Ansible_on-prem_diagram.PNG)
+
 To SSH into the agent machines, simply run `ssh vagrant@[machine-ip]`, where `[machine-ip]` is substituted for the machines IP address.
 
 Can test the the connection works by running any command. To exit back to the controller machine's terminal, use `Exit`.
 
-**MANUAL LOGIN MUST BE COMPLETED FIRST!! BEFORE ANSIBLE CAN AUTOMATICALLY LOGIN INTO THE MACHINE [FOR PLAYBOOKS]**
+**MANUAL LOGIN MUST BE COMPLETED FIRST IF THERE IS AN SSH PASSWORD!! BEFORE ANSIBLE CAN AUTOMATICALLY LOGIN INTO THE MACHINE [FOR PLAYBOOKS]**
 
 ### Ansible configuration file, pinging and SSH login
 We can ping the machines using the Ansible command > `ansible all -m ping`
@@ -160,6 +163,8 @@ Playbooks always start with 3 dashes > `---`
 - The next part is `tasks:`. This tells the YAML file that the following lines will be tasks.
 - `- name: Install Nginx` creates a new task with the name *Install Nginx* and the following lines within the code block are part of that task
 - `apt: pkg=nginx state=present` tells YAML to install the nginx package using the `apt` package manager. `state=present` tells YAML to ensure that the application is running.
+
+*To learn more about the syntax for tasks, look-up the documentation for Ansible*
 
 The YAML file needs to be present within the `/etc/ansible` directory. To execute the playbook, the command is > `ansible-playbook nginx_playbook.yml`
 

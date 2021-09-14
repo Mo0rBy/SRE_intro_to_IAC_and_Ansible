@@ -35,3 +35,30 @@
       sudo ln -s /home/vagrant/app_repo/db/mongodb_config/mongod.conf /etc/mongod.conf
       sudo systemctl start mongod
       sudo systemctl enable mongod
+
+# Alternate method of writing the mongod.conf file
+# ------------------------------------------------
+
+#  - name: "Remove mongod.conf file"
+#    file:
+#      path: /etc/mongod.conf
+#      state: absent
+
+#  - name: "Re-write the mongod.conf file"
+#    blockinfile:
+#      path: /etc/mongod.conf
+#      backup: yes
+#      block: |
+#        "storage:
+#          dbPath: /var/lib/mongodb
+#          journal:
+#          enabled: true
+#
+#        systemLog:
+#          destination: file
+#          logAppend: true
+#          path: /var/log/mongodb/mongod.log
+#
+#        net:
+#          port: 27017
+#          bindIp: 0.0.0.0"

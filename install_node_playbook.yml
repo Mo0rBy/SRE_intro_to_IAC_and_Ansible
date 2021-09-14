@@ -18,7 +18,6 @@
   - name: "Install Nginx"
     apt: pkg=nginx state=present
 
-
 # Install nodejs
   - name: "Add nodejs apt key"
     apt_key:
@@ -35,10 +34,6 @@
       update_cache: yes
       name: nodejs
       state: present
-
-# Install npm package manager
-#  - name: "Install npm package manager"
-#    shell: "sudo apt-get install npm -y"
       
 # Create directory for cloned repo
   - name: Creates directory
@@ -58,33 +53,30 @@
     shell: |
       sudo rm /etc/nginx/sites-available/default
       sudo ln -s /home/vagrant/app_repo/app_provision/default/default.txt /etc/nginx/sites-available/default
+      sudo systemctl restart nginx
 
 # Install pm2
   - name: "Install pm2"
     shell: "npm install pm2 -g -y"
 
-# Remove existing DB_HOST env variable (if it exists)
-  - name: "Remove DB_HOST variable"
-    shell: |
-      sed '2d' /etc/environment
-
-# Add DB_HOST variable to system and environment file
-  - name: "Add DB_HOST variable"
-    shell: |
-      sed '1 a DB_HOST=mongodb://192.168.33.11:27017/posts' /etc/environment
-      export DB_HOST=mongodb://192.168.33.11:27017/posts
+# Configure the /etc/environment file and export DB_HOST
+  - name: "Configure DB_HOST variable"
+    lineinfile:
+      path: /etc/environment
+      line: "DB_HOST=mongodb://192.168.33.11:27017/posts"
+      insertafter: PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
 
 # npm install
   - name: "Go to app folder and npm install"
     command: chdir=/home/vagrant/app_repo/app npm install
 
-# Seed the database
-  - name: "Seed the database"
-    command: chdir=/home/vagrant/app_repo/app node seeds/seed.js
-
 # Kill pm2
   - name: "Kill pm2 processes"
     command: "pm2 kill"
+
+# Seed the database
+  - name: "Seed the database"
+    command: chdir=/home/vagrant/app_repo/app node seeds/seed.js
 
 # Start the app
   - name: "Start app"
