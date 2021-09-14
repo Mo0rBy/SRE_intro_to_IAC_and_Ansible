@@ -288,12 +288,12 @@ The YAML file to spin up an EC2 instance is here:
   gather_facts: True
   become: True
   vars:
-    key_name: sre_key
+    key_name: <insert_kay_name_here>
     region: eu-west-1
-    image: ami-0943382e114f188e8
+    image: ami-id
     id: "SRE will ansible EC2"
-    sec_group: "sg-0dc0997e8d052427a"
-    subnet_id: "subnet-00ac052b1e40c0164"
+    sec_group: "sg-id"
+    subnet_id: "subnet-id"
     ansible_python_interpreter: /usr/bin/python3
 
 # Define tasks
@@ -340,4 +340,4 @@ The YAML file to spin up an EC2 instance is here:
       tags: ['never', 'create_ec2']
 ```
 
-In this script, we define a number of variables such as the AMI ID, security group ID and subnet ID *(and a few more)*. These variables are then used throughout the script. 
+In this script, we define a number of variables such as the AMI ID, security group ID and subnet ID *(and a few more)*. Make sure to substitute the actual ID's into the script. These variables are then used throughout the script. 
