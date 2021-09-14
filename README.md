@@ -174,3 +174,81 @@ We should see this output:
 
 ![](./img/ansible_nginx_status_check.PNG)
 
+---
+# Hybrid cloud infrastructure with Ansible
+## Set-up Ansible vault (secure AWS keys)
+
+- Install dependencies:
+  1. Python3 and above
+  2. Boto3
+  3. pip3
+
+The provision script to install the required dependencies:
+
+```bash
+!#/bin/bash
+sudo apt update -y
+sudo apt-get install tree -y
+sudo apt-add-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible -y
+sudo apt install python3-pip
+pip3 install awscli
+pip3 install boto boto3
+sudo apt-get upgrade -y
+```
+
+Can then check that `AWS CLI` is installed using > `aws --version`
+
+Check the python version that is installed using > `python --version`
+
+If the python version is `Python 2.7.17`, then update the version being used with > `alias python=python3`. Check the python version again and it should be `Python 3.6.9`.
+
+Now we need to copy the AWS key `.pem` file into the ansible controller in order to SSH into the EC2 instances we want to use.
+
+Navigate to `/etc/ansible` and create a directory called `group_vars`. Within this new directory, create another new directory called `all`. Within this directory, we will create an `ansible-vault` file called `pass.yml`.
+
+```bash
+vagrant@controller:/etc/ansible/group_vars/all$ sudo ansible-vault create pass.yml
+New Vault password:
+Confirm New Vault password:
+```
+
+At this point, a Vim editor will open. Input your AWS access key and secret key:
+
+```vim
+aws_access_key: *********************
+aws_secret_key: *********************
+```
+
+Save and quit the Vim editor and `cat` the new YAML file and the output should look like this:
+
+```bash
+vagrant@controller:/etc/ansible/group_vars/all$ sudo cat pass.yml
+$ANSIBLE_VAULT;1.1;AES256
+31353633326534336631636538353938656339663237616363656230383630363831666231636133
+************************************************************
+```
+
+If the keys are just printed to the terminal, you've done something wrong.
+
+### Pinging the machines with Ansible vault
+
+We can ping the agent machines in the same way as before, with an added option to ask for the Ansible vault password:
+
+This is what shows if you use the **wrong** password:
+
+![](./img/Ansible_vault_wrong_pass.PNG)
+
+Using the correct password:
+
+![](./img/Ansible_vault_correct_pass.PNG)
+
+*The web and db machines are not online, therefore the ping fails*
+
+### SSH keys
+
+Generate a new pair of SSH keys in the controller machines `~/.ssh` directory using > `ssh-keygen -t rsa -b 4096`
+
+Give the key the name `sre_key` *(just to keep it simple)*
+
+In order to copy the `.pem` file, find it on your Localhost machine, `cat` the file and copy the text into a new text file on the controller machine.
